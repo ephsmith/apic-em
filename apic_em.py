@@ -11,6 +11,16 @@ requests.packages.urllib3.disable_warnings()
 
 
 class Node():
+    """
+    A generic class to store attributes for network hosts / devices.
+    
+    Example: 
+        my_node = Node('wired', '192.168.0.2')
+
+    Attributes (public):
+        type (str): device type (or model for network devices)
+        ip (str):   the ip address (or management address for network devices)
+    """
     number = 0
 
     def __init__(self, dev_type=None, ip=None):
@@ -31,10 +41,8 @@ class Node():
 
 
 def get_ticket():
-    '''
-    get_ticket: retrieves and returns a service ticket (token)
-                from the APIC-EM Sandbox
-    '''
+    """get_ticket: retrieves and returns a service ticket (token)
+                   from the APIC-EM Sandbox"""
     main_api = "https://sandboxapicem.cisco.com/api/v1/ticket"
     headers = {"content-type": "application/json"}
     body_json = {
@@ -52,6 +60,8 @@ def get_ticket():
 
 
 def get_session():
+    """returns a session with default headers.
+    Uses get_ticket to retrieve token"""
     ticket = get_ticket()
     session = requests.Session()
     session.headers['content-type'] = 'application/json'
