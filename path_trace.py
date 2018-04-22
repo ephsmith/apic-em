@@ -1,7 +1,7 @@
 """
 Path Trace Student Work File
 APIC-EM Workshop
-October 15, 2017
+April 12, 2018
 """
 import json
 import requests
@@ -20,16 +20,14 @@ headers = {
 }
 
 
-# Section 2. 
+# Section 2.
 # Display list of devices and IPs by calling get_host() and get_devices()
 
 print_nodes(get_hosts, caption='Host Table')
 print_nodes(get_devices, caption='Device Table')
 print("\n\n")
 
-# ============================
 # Section 3. Get the source and destination IP addresses for the Path Trace
-# ============================
 
 while True:
 

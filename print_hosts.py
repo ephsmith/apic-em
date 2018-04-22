@@ -1,3 +1,8 @@
+"""
+APIC-EM Workshop
+April 12, 2018
+"""
+
 import requests
 import json
 from tabulate import tabulate
