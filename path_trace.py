@@ -4,16 +4,18 @@ APIC-EM Workshop
 April 12, 2018
 """
 import json
-import requests
 import time
-from apic_em import get_ticket, get_hosts, get_devices, print_nodes
+from apic_em import get_ticket, get_hosts
+from apic_em import get_devices, print_nodes, get_session
 import re
 import socket
 from tabulate import tabulate
 from graphviz import Digraph
+import requests
 
 # disable SSL certificate warnings
 requests.packages.urllib3.disable_warnings()
+
 headers = {
     "content-type": "application/json",
     "X-Auth-Token": get_ticket()
@@ -22,9 +24,9 @@ headers = {
 
 # Section 2.
 # Display list of devices and IPs by calling get_host() and get_devices()
-
-print_nodes(get_hosts, caption='Host Table')
-print_nodes(get_devices, caption='Device Table')
+session = get_session()
+print_nodes(get_hosts, session, caption='Host Table')
+print_nodes(get_devices, session, caption='Device Table')
 print("\n\n")
 
 # Section 3. Get the source and destination IP addresses for the Path Trace
@@ -74,7 +76,8 @@ while True:
 # Post request to initiate Path Trace
 path = json.dumps(path_data)
 api_url = "https://sandboxapicem.cisco.com/api/v1/flow-analysis"
-resp = requests.post(api_url, path, headers=headers, verify=False)
+# resp = requests.post(api_url, path, headers=headers, verify=False)
+resp = session.post(api_url, path, verify=False)
 
 # Inspect the return, get the Flow Analysis ID, put it into a variable
 resp_json = resp.json()
@@ -89,13 +92,13 @@ status = ""
 checks = 1  # Will trigger exit from loop after x iterations
 
 while status != "COMPLETED":
-    r = requests.get(check_url, headers=headers, verify=False)
+    r = session.get(check_url, verify=False)
     response_json = r.json()
     time.sleep(1)
     status = response_json["response"]["request"]['status']
 
     print("REQUEST STATUS: ", status)  # Print the status as the loop runs
-    
+
     if checks == 15:
         # break the execution
         raise Exception(

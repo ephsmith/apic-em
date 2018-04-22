@@ -1,3 +1,7 @@
+'''
+APIC-EM Workshop
+April 12, 2018
+'''
 import json
 import requests
 from tabulate import tabulate
@@ -47,20 +51,27 @@ def get_ticket():
     return serviceTicket
 
 
-def get_hosts():
+def get_session():
+    ticket = get_ticket()
+    session = requests.Session()
+    session.headers['content-type'] = 'application/json'
+    session.headers['X-Auth-Token'] = ticket
+
+    return session
+
+
+def get_hosts(session=None):
     '''
     get_hosts: returns an array of Node objects where each Node
     in the array stores data for a host
     '''
     api_url = "https://sandboxapicem.cisco.com/api/v1/host"
-    ticket = get_ticket()
-    headers = {
-        "content-type": "application/json",
-        "X-Auth-Token": ticket
-    }
 
-    resp = requests.get(api_url, headers=headers, verify=False)
-    # print("Status of /host request: ", resp.status_code)
+    if session is None:
+        session = get_session()
+
+    resp = session.get(api_url, verify=False)
+
     if resp.status_code != 200:
         raise Exception(
             "Status code does not equal 200. Response text: " + resp.text)
@@ -76,29 +87,26 @@ def get_hosts():
     return host_list
 
 
-def print_nodes(host_function, caption=None):
+def print_nodes(data_function, session=None, caption=None):
     '''
     print_nodes: prints a table of nodes retrieved from fun with caption.
     '''
     table = []
     header = ["Number", "Type", "IP"]
-    for n, host in enumerate(host_function()):
-        table.append([n, host.type, host.ip])
+    for n, data in enumerate(data_function(session)):
+        table.append([n, data.type, data.ip])
     if caption:
         print('\n\n', caption, '\n')
     print(tabulate(table, header))
 
 
-def get_devices():
+def get_devices(session=None):
     api_url = "https://sandboxapicem.cisco.com/api/v1/network-device"
-    ticket = get_ticket()
-    headers = {
-        "content-type": "application/json",
-        "X-Auth-Token": ticket
-    }
 
-    resp = requests.get(api_url, headers=headers, verify=False)
-    print("Status of /network-device request: ", resp.status_code)
+    if session is None:
+        session = get_session()
+    resp = session.get(api_url, verify=False)
+
     if resp.status_code != 200:
         raise Exception(
             "Status code does not equal 200. Response text: " + resp.text)
