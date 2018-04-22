@@ -10,6 +10,7 @@ from apic_em import get_ticket, get_hosts, get_devices, print_nodes
 import re
 import socket
 from tabulate import tabulate
+from graphviz import Digraph
 
 # disable SSL certificate warnings
 requests.packages.urllib3.disable_warnings()
@@ -170,3 +171,15 @@ table_header = [
                 "Egress Int"
                ]
 print(tabulate(all_devices, table_header))
+
+graph = Digraph('Path Trace')
+
+for n, dev in enumerate(all_devices):
+    graph.node(str(n), dev[1])
+
+    if n > 0:
+        last_dev = all_devices[n-1]
+        graph.edge(str(n-1), str(n),
+                   label='{}->{}'.format(last_dev[2], dev[2]))
+print('\n\ngraphviz output\n')
+print(graph.source)
