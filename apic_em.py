@@ -5,6 +5,8 @@ April 12, 2018
 import json
 import requests
 from tabulate import tabulate
+from getpass import getpass
+from bcrypt import checkpw
 
 # disable SSL certificate warnings
 requests.packages.urllib3.disable_warnings()
@@ -43,11 +45,23 @@ class Node():
 def get_ticket():
     """get_ticket: retrieves and returns a service ticket (token)
                    from the APIC-EM Sandbox"""
+    with open('data.dat', 'rb') as f:
+        hashed = f.read()
+
+    attempts = 0
+    while attempts < 3:
+        password = getpass("Enter the password for devnetuser: ")
+        if checkpw(password.encode('utf8'), hashed):
+            break
+        else:
+            attempts += 1
+            print('Please try again...')
+
     main_api = "https://sandboxapicem.cisco.com/api/v1/ticket"
     headers = {"content-type": "application/json"}
     body_json = {
         "username": "devnetuser",
-        "password": "Cisco123!",
+        "password": password,
     }
     resp = requests.post(main_api,
                          json.dumps(body_json),
