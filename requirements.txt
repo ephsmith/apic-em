@@ -1,7 +1,11 @@
+bcrypt==3.1.4
 certifi==2018.1.18
+cffi==1.11.5
 chardet==3.0.4
 graphviz==0.8.2
 idna==2.6
+pycparser==2.18
 requests==2.18.4
+six==1.11.0
 tabulate==0.8.2
 urllib3==1.22
